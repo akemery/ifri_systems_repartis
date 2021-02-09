@@ -4,7 +4,8 @@
 #define TRUE            1
 #define MAX_PATH      255 /*Maximum length of file name*/
 #define BUF_SIZE     1024 /* How much data to transfer at once*/
-#define FILE_SERVER   243 /* File server's network address*/
+#define SERVER_ADDR  "127.0.0.1" /* File server's network address*/
+#define SERVER_PORT  "4443"
 
 /* definitions of the allowed operations*/
 #define CREATE 1         /*Create a new file*/
@@ -24,6 +25,7 @@ struct message{
   long count;      /* number of bytes to transfert */
   long offset ;    /* position if the file to start I/O*/
   long result;     /* result of the operation */
+  long name_len;   /* name len */
   char name[MAX_PATH];  /*name of the file being operated on */
   char data[BUF_SIZE];   /* data to be read or written*/
 };
@@ -31,3 +33,5 @@ struct message{
 int ifri_receive(int from, struct message *m);
 int ifri_send(int to, struct message *m);
 int resolve_address(struct sockaddr *sa, socklen_t *salen, const char *host, const char *port, int family, int type, int proto);
+
+

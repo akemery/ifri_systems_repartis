@@ -4,12 +4,37 @@
 #include <netdb.h>
 #include <stdio.h>
 #include <errno.h>
+#include <stdlib.h>
 #include "message.h"
 
+#define SL sizeof(long)
+
 int ifri_receive(int from, struct message *m){
+  char *buff = malloc(sizeof(struct message));
+  int ret = recv(from, buff, sizeof(struct message), 0);
+  memcpy(&m->source,   buff, SL);
+  memcpy(&m->dest,     buff+SL, SL);
+  memcpy(&m->opcode,   buff+SL+SL, SL);
+  memcpy(&m->count,    buff+SL+SL+SL, SL);
+  memcpy(&m->offset,   buff+SL+SL+SL+SL, SL);
+  memcpy(&m->result,   buff+SL+SL+SL+SL+SL, SL);
+  memcpy(&m->name_len, buff+SL+SL+SL+SL+SL+SL, SL);
+  memcpy(&m->name,     buff+SL+SL+SL+SL+SL+SL+SL, m->name_len);
+  memcpy(&m->data,     buff+SL+SL+SL+SL+SL+SL+SL+ m->name_len, m->count);
   return OK;
 }
 int ifri_send(int to, struct message *m){
+  char *buff = malloc(sizeof(struct message));
+  memcpy(buff, &m->source, SL);
+  memcpy(buff+SL, &m->dest, SL);
+  memcpy(buff+SL+SL, &m->opcode, SL);
+  memcpy(buff+SL+SL+SL, &m->count, SL);
+  memcpy(buff+SL+SL+SL+SL, &m->offset, SL);
+  memcpy(buff+SL+SL+SL+SL+SL, &m->result, SL);
+  memcpy(buff+SL+SL+SL+SL+SL+SL, &m->name_len, SL);
+  memcpy(buff+SL+SL+SL+SL+SL+SL+SL, m->name, m->name_len);
+  memcpy(buff+SL+SL+SL+SL+SL+SL+SL+m->name_len, m->data, m->count);
+  send(to, buff, sizeof(struct message),0);
   return OK;
 }
 

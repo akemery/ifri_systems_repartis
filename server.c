@@ -6,6 +6,7 @@
 #include <errno.h>
 #include "message.h"
 
+int csd;
 static int do_create(struct message *m1, struct message *m2);
 static int do_read(struct message *m1, struct message *m2);
 static int do_write(struct message *m1, struct message *m2);
@@ -18,6 +19,10 @@ int main(int argc, char *argv[]){
    struct message m1, m2; /*incomming and outgoing message*/
    int r;                 /* result code*/
    initialize();
+   ifri_receive(csd, &m1);
+   fprintf(stderr,"%ld:%ld:%ld:%ld:%ld:%ld:%ld:%s:%s",m1.source, m1.dest, m1.opcode,
+            m1.count, m1.offset, m1.result,m1.name_len, m1.name, m1.data);
+   
    // while(TRUE){           /*server runs forever*/
      //ifri_receive(FILE_SERVER, &m1); /* block waiting for a message*/
     /* switch(m1.opcode){
@@ -60,9 +65,9 @@ static int do_delete(struct message *m1, struct message *m2){
 
 static int initialize(void){
    struct sockaddr server_addr, client_addr;
-   int salen, clen, csd;
+   int salen, clen;
    int sd = socket(AF_INET, SOCK_STREAM, 0);
-   if(resolve_address(&server_addr, &salen, "127.0.0.1", "4443", AF_INET, SOCK_STREAM, IPPROTO_TCP)!= 0){
+   if(resolve_address(&server_addr, &salen, SERVER_ADDR, SERVER_PORT, AF_INET, SOCK_STREAM, IPPROTO_TCP)!= 0){
       fprintf(stderr, "Erreur de configuration de sockaddr\n");
       return -1;
    }
