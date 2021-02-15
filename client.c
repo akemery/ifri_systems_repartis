@@ -4,11 +4,13 @@
 #include <sys/types.h>          
 #include <sys/socket.h>
 #include <netdb.h>
+#include <unistd.h>
 #include "message.h"
 
 int sd;
 static int copy(char *src, char *dst);
 static int initialize(void);
+static int release(void);
 
 static int copy(char *src, char *dst){
   struct message m1;
@@ -72,5 +74,10 @@ int main(int argc, char * argv){
     data[i] = i;   /* data to be read or written*/
   memcpy(m1.data, data, m1.count);
   ifri_send(sd, &m1);
+  release();
   return 0;
+}
+
+static int release(void){
+  return close(sd);
 }

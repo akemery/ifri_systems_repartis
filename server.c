@@ -4,15 +4,18 @@
 #include <netdb.h>
 #include <stdio.h>
 #include <errno.h>
+#include <unistd.h>
 #include "message.h"
 
 int csd;
+int sd;
 static int do_create(struct message *m1, struct message *m2);
 static int do_read(struct message *m1, struct message *m2);
 static int do_write(struct message *m1, struct message *m2);
 static int do_delete(struct message *m1, struct message *m2);
 
 static int initialize(void);
+static int release(void);
 
 
 int main(int argc, char *argv[]){
@@ -22,6 +25,8 @@ int main(int argc, char *argv[]){
    ifri_receive(csd, &m1);
    fprintf(stderr,"%ld:%ld:%ld:%ld:%ld:%ld:%ld:%s:%s",m1.source, m1.dest, m1.opcode,
             m1.count, m1.offset, m1.result,m1.name_len, m1.name, m1.data);
+   for(int i = 0; i< m1.count; i++)
+     fprintf(stderr, "%c ",m1.data[i]);
    
    // while(TRUE){           /*server runs forever*/
      //ifri_receive(FILE_SERVER, &m1); /* block waiting for a message*/
@@ -44,6 +49,7 @@ int main(int argc, char *argv[]){
      m2.result = r;  /* return result to client */
      //ifri_send(m1.source, &m2); /* send reply*/
   // }
+  release();
 }
 
 static int do_create(struct message *m1, struct message *m2){
@@ -66,7 +72,7 @@ static int do_delete(struct message *m1, struct message *m2){
 static int initialize(void){
    struct sockaddr server_addr, client_addr;
    int salen, clen;
-   int sd = socket(AF_INET, SOCK_STREAM, 0);
+   sd = socket(AF_INET, SOCK_STREAM, 0);
    if(resolve_address(&server_addr, &salen, SERVER_ADDR, SERVER_PORT, AF_INET, SOCK_STREAM, IPPROTO_TCP)!= 0){
       fprintf(stderr, "Erreur de configuration de sockaddr\n");
       return -1;
@@ -84,4 +90,8 @@ static int initialize(void){
       return -1;
     }
     fprintf(stderr, "Connexion acceptée %d \n", csd);   
+}
+
+static int release(void){
+  return (close(sd) || close(csd));
 }
