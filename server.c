@@ -13,6 +13,8 @@
 
 int csd;
 int sd;
+static int rfd;
+static int wfd;
 static int do_create(struct message *m1, struct message *m2);
 static int do_read(struct message *m1, struct message *m2);
 static int do_write(struct message *m1, struct message *m2);
@@ -28,11 +30,6 @@ int main(int argc, char *argv[]){
    memset(&m1,0, sizeof(m1)); 
    memset(&m2,0, sizeof(m2));              
    initialize();
-   /*fprintf(stderr,"%ld:%ld:%ld:%ld:%ld:%ld:%ld:%s:%s",m1.source, m1.dest, m1.opcode,
-            m1.count, m1.offset, m1.result,m1.name_len, m1.name, m1.data);
-   for(int i = 0; i< m1.count; i++)
-     fprintf(stderr, "%c ",m1.data[i]);*/
-   
    while(TRUE){           /*server runs forever*/
      //ifri_receive(FILE_SERVER, &m1); /* block waiting for a message*/
      ifri_receive(csd, &m1);
@@ -53,7 +50,9 @@ int main(int argc, char *argv[]){
           r = E_BAD_OPCODE;
      }
      m2.result = r;  /* return result to client */
-     ifri_send(m1.source, &m2); /* send reply*/
+     if(r > 0)
+       m2.count = r;
+     ifri_send(csd, &m2); /* send reply*/
   }
   release();
 }
@@ -64,24 +63,27 @@ static int do_create(struct message *m1, struct message *m2){
 
 static int do_read(struct message *m1, struct message *m2){
   int fd, r;
-  if((fd = open(m1->name, O_RDONLY))<0){
+  if((rfd == -1) && (rfd = open(m1->name, O_RDONLY | S_IRUSR | S_IWUSR ))<0){
+    fprintf(stderr, "error when opening file %d %d %s\n",fd, errno, m1->name);
     return E_IO;
   }
-  lseek(fd, m1->offset, SEEK_SET);
-  r = read(fd, m2->data, m1->count);
-  fprintf(stderr, "from read %d\n", r);
-  if(r < 0)
-     return  E_IO;
+  lseek(rfd, m1->offset, SEEK_SET);
+  r = read(rfd, m2->data, m1->count);
+  if(r < 0){
+    fprintf(stderr, "error when reading file %d %d\n",fd, errno);
+    return  E_IO;
+  }
   return r;
 }
 
 static int do_write(struct message *m1, struct message *m2){
-  int fd, r;
-  if((fd = open(m1->name, O_WRONLY)!=0)){
+  int r;
+  if( (wfd == -1) && (wfd = open(m1->name, O_CREAT | O_WRONLY | S_IRWXU )) < 0){
+    fprintf(stderr, "do_write error when opening (%s), %d:%d\n", m1->name, wfd, errno);
     return E_IO;
   }
-  lseek(fd, m1->offset, SEEK_SET);
-  r = write(fd, m2->data, m1->count);
+  lseek(wfd, m1->offset, SEEK_SET);
+  r = write(wfd, m1->data, m1->count);
   if(r < 0)
      return  E_IO;
   return r;
@@ -96,7 +98,8 @@ static int initialize(void){
    struct sockaddr server_addr, client_addr;
    int salen, clen;
    sd = socket(AF_INET, SOCK_STREAM, 0);
-   if(resolve_address(&server_addr, &salen, SERVER_ADDR, SERVER_PORT, AF_INET, SOCK_STREAM, IPPROTO_TCP)!= 0){
+   if(resolve_address(&server_addr, &salen, SERVER_ADDR, SERVER_PORT, AF_INET, 
+      SOCK_STREAM, IPPROTO_TCP)!= 0){
       fprintf(stderr, "Erreur de configuration de sockaddr\n");
       return -1;
    }
@@ -112,9 +115,11 @@ static int initialize(void){
       fprintf(stderr, "Un petit problème lors du accept %d\n", errno);
       return -1;
     }
-    fprintf(stderr, "Connexion acceptée %d \n", csd);   
+    fprintf(stderr, "Connexion acceptée %d \n", csd);  
+    rfd = -1;
+    wfd = -1; 
 }
 
 static int release(void){
-  return (close(sd) || close(csd));
+  return (close(sd) || close(csd) || close(rfd) || close(wfd));
 }

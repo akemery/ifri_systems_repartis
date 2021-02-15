@@ -10,8 +10,12 @@
 #define SL sizeof(long)
 
 int ifri_receive(int from, struct message *m){
+  int ret;
   char *buff = malloc(sizeof(struct message));
-  int ret = recv(from, buff, sizeof(struct message), 0);
+  while((ret = recv(from, buff, sizeof(struct message), 0)) < 0 && errno ==EINTR);
+  if(ret < 0)
+    return (E_IO);
+  memset(m, 0, sizeof(*m));
   memcpy(&m->source,   buff, SL);
   memcpy(&m->dest,     buff+SL, SL);
   memcpy(&m->opcode,   buff+SL+SL, SL);
@@ -21,7 +25,6 @@ int ifri_receive(int from, struct message *m){
   memcpy(&m->name_len, buff+SL+SL+SL+SL+SL+SL, SL);
   memcpy(&m->name,     buff+SL+SL+SL+SL+SL+SL+SL, m->name_len);
   memcpy(&m->data,     buff+SL+SL+SL+SL+SL+SL+SL+ m->name_len, m->count);
-  fprintf(stderr, "from here receive_ifri 2\n");
   return OK;
 }
 int ifri_send(int to, struct message *m){
@@ -35,8 +38,7 @@ int ifri_send(int to, struct message *m){
   memcpy(buff+SL+SL+SL+SL+SL+SL, &m->name_len, SL);
   memcpy(buff+SL+SL+SL+SL+SL+SL+SL, m->name, m->name_len);
   memcpy(buff+SL+SL+SL+SL+SL+SL+SL+m->name_len, m->data, m->count);
-  send(to, buff, sizeof(struct message),0);
-  fprintf(stderr, "from here send_ifri 2\n");
+  int ret = send(to, buff, sizeof(struct message),0);
   return OK;
 }
 

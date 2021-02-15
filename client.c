@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <sys/resource.h>
 #include "message.h"
 
 int sd;
@@ -20,23 +21,23 @@ static int copy(char *src, char *dst){
   
   position = 0;
   do{
+    memset(&m1, 0, sizeof(m1));
     m1.opcode = READ;
     m1.offset = position;
     m1.count = BUF_SIZE;
-    strcpy(m1.name, src);
     m1.name_len = strlen(src);
+    strncpy(m1.name, src, m1.name_len);
     ifri_send(sd, &m1);
-    fprintf(stderr, "m1.name from client %s\n", m1.name);
-    ifri_receive(client, &m1);
-    fprintf(stderr, "m1.name from client %s\n", m1.data);
-    /*write the data just received to the destination file*/
+    ifri_receive(sd, &m1);
     
+    /*write the data just received to the destination file*/
     m1.opcode = WRITE;
     m1.offset = position;
     m1.count  = m1.result;
-    strcpy(m1.name, dst);
+    m1.name_len = strlen(dst);
+    strncpy(m1.name, dst, m1.name_len);
     ifri_send(sd, &m1);
-    ifri_receive(client, &m1);
+    ifri_receive(sd, &m1);
     position+=m1.result;
   } while(m1.result > 0);
   
@@ -47,7 +48,8 @@ static int initialize(void){
   struct sockaddr server_addr;
   sd = socket(AF_INET, SOCK_STREAM, 0);
   int salen, err;
-  if(resolve_address(&server_addr, &salen, SERVER_ADDR, SERVER_PORT, AF_INET, SOCK_STREAM, IPPROTO_TCP)!= 0){
+  if(resolve_address(&server_addr, &salen, SERVER_ADDR, SERVER_PORT, 
+      AF_INET, SOCK_STREAM, IPPROTO_TCP)!= 0){
       fprintf(stderr, "Erreur de configuration de sockaddr\n");
       return -1;
    }
@@ -59,9 +61,13 @@ static int initialize(void){
    return OK;
 }
 
-int main(int argc, char * argv){
+int main(int argc, char * argv[]){
+  if(argc < 3){
+    fprintf(stderr, "USAGE %s <src> <dst>\n", argv[0] );
+    return 0;
+  }
   initialize();
-  copy("cli.c", "cli2.c");
+  copy(argv[1], argv[2]);
   release();
   return 0;
 }
