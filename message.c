@@ -21,6 +21,7 @@ int ifri_receive(int from, struct message *m){
   memcpy(&m->name_len, buff+SL+SL+SL+SL+SL+SL, SL);
   memcpy(&m->name,     buff+SL+SL+SL+SL+SL+SL+SL, m->name_len);
   memcpy(&m->data,     buff+SL+SL+SL+SL+SL+SL+SL+ m->name_len, m->count);
+  fprintf(stderr, "from here receive_ifri 2\n");
   return OK;
 }
 int ifri_send(int to, struct message *m){
@@ -35,6 +36,7 @@ int ifri_send(int to, struct message *m){
   memcpy(buff+SL+SL+SL+SL+SL+SL+SL, m->name, m->name_len);
   memcpy(buff+SL+SL+SL+SL+SL+SL+SL+m->name_len, m->data, m->count);
   send(to, buff, sizeof(struct message),0);
+  fprintf(stderr, "from here send_ifri 2\n");
   return OK;
 }
 

@@ -5,6 +5,10 @@
 #include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
+#include <sys/stat.h>
+#include <stdlib.h>
+#include <fcntl.h>
+
 #include "message.h"
 
 int csd;
@@ -20,35 +24,37 @@ static int release(void);
 
 int main(int argc, char *argv[]){
    struct message m1, m2; /*incomming and outgoing message*/
-   int r;                 /* result code*/
+   int r;   /* result code*/
+   memset(&m1,0, sizeof(m1)); 
+   memset(&m2,0, sizeof(m2));              
    initialize();
-   ifri_receive(csd, &m1);
-   fprintf(stderr,"%ld:%ld:%ld:%ld:%ld:%ld:%ld:%s:%s",m1.source, m1.dest, m1.opcode,
+   /*fprintf(stderr,"%ld:%ld:%ld:%ld:%ld:%ld:%ld:%s:%s",m1.source, m1.dest, m1.opcode,
             m1.count, m1.offset, m1.result,m1.name_len, m1.name, m1.data);
    for(int i = 0; i< m1.count; i++)
-     fprintf(stderr, "%c ",m1.data[i]);
+     fprintf(stderr, "%c ",m1.data[i]);*/
    
-   // while(TRUE){           /*server runs forever*/
+   while(TRUE){           /*server runs forever*/
      //ifri_receive(FILE_SERVER, &m1); /* block waiting for a message*/
-    /* switch(m1.opcode){
-        case CREATE: 
+     ifri_receive(csd, &m1);
+     switch(m1.opcode){
+        /*case CREATE: 
           r = do_create(&m1, &m2);
-          break;
+          break;*/
         case READ:
           r = do_read(&m1, &m2);
           break;
         case WRITE:
           r = do_write(&m1, &m2);
           break;
-        case DELETE:
+        /*case DELETE:
           r = do_delete(&m1, &m2);
-          break;
+          break;*/
         default:
           r = E_BAD_OPCODE;
      }
      m2.result = r;  /* return result to client */
-     //ifri_send(m1.source, &m2); /* send reply*/
-  // }
+     ifri_send(m1.source, &m2); /* send reply*/
+  }
   release();
 }
 
@@ -57,11 +63,28 @@ static int do_create(struct message *m1, struct message *m2){
 }
 
 static int do_read(struct message *m1, struct message *m2){
-  return OK;
+  int fd, r;
+  if((fd = open(m1->name, O_RDONLY))<0){
+    return E_IO;
+  }
+  lseek(fd, m1->offset, SEEK_SET);
+  r = read(fd, m2->data, m1->count);
+  fprintf(stderr, "from read %d\n", r);
+  if(r < 0)
+     return  E_IO;
+  return r;
 }
 
 static int do_write(struct message *m1, struct message *m2){
-  return OK;
+  int fd, r;
+  if((fd = open(m1->name, O_WRONLY)!=0)){
+    return E_IO;
+  }
+  lseek(fd, m1->offset, SEEK_SET);
+  r = write(fd, m2->data, m1->count);
+  if(r < 0)
+     return  E_IO;
+  return r;
 }
 
 static int do_delete(struct message *m1, struct message *m2){
