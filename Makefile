@@ -10,10 +10,10 @@ server.o: server.c
 	gcc -c  server.c -o server.o
 
 server: message.o server.o
-	gcc message.o server.o -o server
+	gcc -g message.o server.o -o server 
 
 client: message.o client.o
-	gcc message.o client.o -o client
+	gcc -g message.o client.o -o client
 	
 
 clean:
