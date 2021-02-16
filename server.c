@@ -20,16 +20,20 @@ static int do_read(struct message *m1, struct message *m2);
 static int do_write(struct message *m1, struct message *m2);
 static int do_delete(struct message *m1, struct message *m2);
 
-static int initialize(void);
+static int initialize(char *server_addr, char *server_port);
 static int release(void);
 
 
 int main(int argc, char *argv[]){
   struct message m1, m2; /*incomming and outgoing message*/
   int r;   /* result code*/
+  if(argc != 3){
+    fprintf(stderr, "USAGE: %s <server_addr> <server_port>\n", argv[0]);
+    return 0;
+  }
   memset(&m1,0, sizeof(m1)); 
   memset(&m2,0, sizeof(m2));              
-  initialize();
+  initialize(argv[1], argv[2]);
   while(TRUE){
     struct sockaddr client_addr;
     int clen;
@@ -111,11 +115,11 @@ static int do_delete(struct message *m1, struct message *m2){
 }
 
 
-static int initialize(void){
+static int initialize(char *server_ipaddr, char *server_port){
    struct sockaddr server_addr;
    int salen;
    sd = socket(AF_INET, SOCK_STREAM, 0);
-   if(resolve_address(&server_addr, &salen, SERVER_ADDR, SERVER_PORT, AF_INET, 
+   if(resolve_address(&server_addr, &salen, server_ipaddr, server_port, AF_INET, 
       SOCK_STREAM, IPPROTO_TCP)!= 0){
       fprintf(stderr, "Erreur de configuration de sockaddr\n");
       return -1;
