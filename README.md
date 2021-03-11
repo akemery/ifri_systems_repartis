@@ -67,5 +67,18 @@ Vous pouvez lancer les machine h1 et h2 à l'aide de la commande suivante:
   mininet> xterm h1 h2
 ``` 
 
+En supposant que h1 est le client et h2 est le serveur. 
+
+Sur h2 
+
+```
+  ./server 192.168.3.100 4444 
+```
+
+Sur h1
+```
+  ./client 192.168.3.100 4444 <chemin_fichier_src> <chemin_fichier_dest>
+```
+
 # Bugs
 Pour les éventuels problèmes veuillez contacter assogba.emery@gmail.com
