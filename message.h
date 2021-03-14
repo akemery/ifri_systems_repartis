@@ -1,5 +1,9 @@
+#ifndef _MESSAGE_H
+#define _MESSAGE_H
+
 #include <sys/types.h>          
 #include <sys/socket.h>
+#include <stdbool.h>
 /*Definitions needed by clients and servers*/
 #define TRUE            1
 #define MAX_PATH      255 /*Maximum length of file name*/
@@ -28,10 +32,16 @@ struct message{
   long name_len;   /* name len */
   char name[MAX_PATH];  /*name of the file being operated on */
   char data[BUF_SIZE];   /* data to be read or written*/
+  int send_file_content;
 };
 
 int ifri_receive(int from, struct message *m);
 int ifri_send(int to, struct message *m);
-int resolve_address(struct sockaddr *sa, socklen_t *salen, const char *host, const char *port, int family, int type, int proto);
-
-
+int resolve_address(struct sockaddr *sa, socklen_t *salen, const char *host,
+   const char *port, int family, int type, int proto);
+double gettime_ms(void);
+void init_params(int recv_log_, int sent_log_);
+int set_recv_data(int recv_data);
+int print_recv_log(void);
+int print_sent_log(void);
+#endif
