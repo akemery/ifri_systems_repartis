@@ -5,6 +5,11 @@ possibilité de s'envoyer des fichiers. Le client écoute sur une adresse
 et un port. Le client a la posibilité de se connecter au serveur et d'envoyer 
 des requêtes de lecture ou d'écriture au serveur.
 
+Les commandes sont envoyés sur une connexion TCP et les données sont envoyées 
+sur une autre connexion TCP. Avec l'option -f du coté du client il est possible 
+d'avoir une version rapide  du client et du serveur. 
+Sans l'option -f on a une version très lente  du client et du serveur. 
+
 # Compilation
   ```
     $ make
