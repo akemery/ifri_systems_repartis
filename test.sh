@@ -1,9 +1,15 @@
 #!/bin/bash
 
-for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 18 19 20
+for i in `seq 10`
 do
    dest="/tmp/"
+   out="/tmp/"
+   rlog="/tmp/r"
+   slog="/tmp/s"
+   rlog+=$i
+   slog+=$i
+   out+=$i
    dest+=$i
-   dest+=$1
-   ./client $2 $3 $1 $dest &
+   dest+=$4
+   ./client -s $1 -p $2 -P $3 -i $4 -o $dest -S $rlog -R $slog -f  &
 done
