@@ -97,5 +97,11 @@ Sur c1 pour la version rapide
   $ ./client -s 192.168.3.100 -p 4444 -P 4445 -S send_log_file_path -R recv_log_file_path -i src_file -o dst_file -f
 ```
 
+Pour lancer plusieurs clients à la fois vous pouvez utiliser le script test.sh
+
+```
+  ./test.sh 192.168.3.100 4444 4445 <fichier_a_transferer>
+```
+
 # Bugs
 Pour les éventuels problèmes veuillez contacter assogba.emery@gmail.com
