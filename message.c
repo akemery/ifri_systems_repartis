@@ -111,8 +111,8 @@ static int log_data(int fd, double nbytes, int *nMB, double *lasttime){
     (*nMB)++;
     double delta_time = (gettime_ms() - start_time)/1000;
     double bw = 10*1000/(delta_time - *lasttime);
-    ret = dprintf(fd, "%.6f %.6f %d %.6f %d\n", delta_time/1000, bw, (*nMB)*10, nbytes/10000000, *nMB);
-    //ret = snprintf(logger[logger_iter++], 50, "%.6f %.6f %d %.6f %d\n", delta_time/1000, bw, (*nMB)*10, nbytes/10000000, *nMB);
+    ret = dprintf(fd, "%.6f %.6f\n", delta_time/1000, bw);
+    //ret = snprintf(logger[logger_iter++], 50, "%.6f %.6f\n", delta_time/1000, bw);
     *lasttime = delta_time;
   }
   return ret;
