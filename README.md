@@ -33,8 +33,26 @@ comment installer Mininet veuillez visiter le site de Mininet http://mininet.org
 
 ## Lancer le script python
 
+` gbeffasarl.py` est un script Mininet qui met en oeuvre la topologie réseau
+suivante. Le lien r0->r1 est un goulot d'étranglement. Les clients c1, c2 et c3
+sont d'un côté du goulot d'étranglement et les serveur s1, s2 et s3 sont de 
+l'autre coté du goulot d'étranglement.
+
 ```
-  $ sudo python3 gbeffasarl.py
+              c3    s1    
+               |    |
+               |    |
+         c1----r0--r1----s2
+               |    | 
+               |    | 
+               |    | 
+              c2    s3  
+               
+``` 
+
+
+```
+  $ sudo python3 gbeffasarl.py <delai> <bw> <loss_rate> <jitter>
 ```
 
 Il est possible d'avoir une erreur du controlleur.
@@ -52,37 +70,31 @@ Pour résoudre cette erreur il faut saisir la commande suivante:
 
 Puis relancer le script python
 ```
-  $ sudo python3 gbeffasarl.py
+  $ sudo python3 gbeffasarl.py <delai> <bw> <loss_rate> <jitter>
 ```
 
-` gbeffasarl.py` est un script Mininet qui met en oeuvre la topologie réseau
-suivante.
+Vous pouvez lancer les machines c1 et s1 à l'aide de la commande suivante:
 
 ```
-         h2
-         |
-   h1---r0 -- r1--h3
-               |
-               h4
-               
-``` 
-Vous pouvez lancer les machine h1 et h2 à l'aide de la commande suivante:
-
-```
-  mininet> xterm h1 h2
+  mininet> xterm c1 s1
 ``` 
 
-En supposant que h1 est le client et h2 est le serveur. 
+s1 étant le serveur et c1 le client vous pouvez exécuter les commandes suivantes sur chacun d'eux.
 
-Sur h2 
+Sur s1 
 
 ```
-  ./server 192.168.3.100 4444 
+  $ ./server -s 192.168.3.100 -p 4444 -P 4445 -S send_log_file_path -R recv_log_file_path
+``` 
+
+sur c1 pour la version lente
+```
+  $ ./client -s 192.168.3.100 -p 4444 -P 4445 -S send_log_file_path -R recv_log_file_path -i src_file -o dst_file 
 ```
 
-Sur h1
+Sur c1 pour la version rapide
 ```
-  ./client 192.168.3.100 4444 <chemin_fichier_src> <chemin_fichier_dest>
+  $ ./client -s 192.168.3.100 -p 4444 -P 4445 -S send_log_file_path -R recv_log_file_path -i src_file -o dst_file -f
 ```
 
 # Bugs
