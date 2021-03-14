@@ -10,16 +10,16 @@ des requêtes de lecture ou d'écriture au serveur.
     $ make
   ```
 # Utilisation
-## Test en local
+## Tester le serveur et le client
 ### Côté du serveur
 ```
-  $ ./server <addrip_du_serveur> <port> 
+  $ ./server -s server_addr -p server_port -P server_port2 -S send_log_file_path -R recv_log_file_path
 ```
 
 ### Côté du client
 
 ```
-  $ ./client <addrip_du_serveur> <port> <chemin_fichier_source> <chemin_fichier_dest>
+  $ ./client -s server_addr -p server_port -P port2 -S send_log_file_path -R recv_log_file_path -i src_file -o dst_file [-f]
 ```
 
 # Test avec mininet
