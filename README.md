@@ -69,8 +69,18 @@ Pour résoudre cette erreur il faut saisir la commande suivante:
 ```
 
 Puis relancer le script python
+
+`bw` est la bande passante. Une valeur possible peut être 100 soit 100Mbps.
+
+`delay` est le délai, c'est à dire le temps de propagation d'un signal de r0 à
+r1. Une valeur possible est 10, soit 10 ms pour simuler un LAN.
+
+`loss_rate` est le taux de perte sur le lien en %. Une valeur possible est 0.
+
+`jitter` est la variaance du délai. Une valeur possible est 0.
+
 ```
-  $ sudo python3 gbeffasarl.py <delai> <bw> <loss_rate> <jitter>
+  $ sudo python3 gbeffasarl.py <delay> <bw> <loss_rate> <jitter>
 ```
 
 Vous pouvez lancer les machines c1 et s1 à l'aide de la commande suivante:
