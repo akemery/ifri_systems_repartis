@@ -17,14 +17,46 @@ Sans l'option -f on a une version très lente  du client et du serveur.
 # Utilisation
 ## Tester le serveur et le client
 ### Côté du serveur
+`server_addr` est l'adresse IP sur lequel le serveur écoute. Une valeur possible
+pour un test en local est `127.0.0.1`.
+
+`server_port` est le port d'écoute du server pour l'envoi des données. Une 
+valeur possible doit être supérieur à `1024`, prenez `4441` par exemple.
+
+`server_port2` est le d'écoute du server pour la réception des commandes et 
+l'envoie des réponses. Une valeur possible doit être supérieur à `1024`, prenez
+ `4441` par exemple.
+ 
+Après l'envoie de 10Mbytes de données le serveur a la possibilté d'évaluer son 
+débit sous la forme `time bw`. Cette donnée est mise ligne par ligne dans le
+fichier `send_log_file_path`.
+
+De même après la réception de 10Mbytes de données le serveur a la possibilité
+d'évaluer sous la forme `time bw` son débit. Cette donnée est stockée ligne par
+ligne dans le fichier  `recv_log_file_path`.
+
+Les données de ces fichiers de log peuvent être utilisées pour tracer des graphes
+d'évaluation de la qualité du service du serveur dans le temps.
+
 ```
   $ ./server -s server_addr -p server_port -P server_port2 -S send_log_file_path -R recv_log_file_path
 ```
 
 ### Côté du client
 
+`server_addr`, `server_port`, `server_port2` ont les mêmes valeurs et les mêmes
+significations que celles fournies pour le serveur.
+
+`send_log_file_path` et `recv_log_file_path` ont les mêmes signification que 
+dans le cas du serveur mais il faille leur attribuer des valeurs différentes si
+les tests sont faits localement afin d'éviter de mélanger les données de perfor-
+mances du serveur et celles du client.
+
+`src_file` est le fichier source à déplacer et `dst_file` est sa nouvelle desti-
+nation.
+
 ```
-  $ ./client -s server_addr -p server_port -P port2 -S send_log_file_path -R recv_log_file_path -i src_file -o dst_file [-f]
+  $ ./client -s server_addr -p server_port -P server_port2 -S send_log_file_path -R recv_log_file_path -i src_file -o dst_file [-f]
 ```
 
 # Test avec mininet
