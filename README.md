@@ -84,7 +84,7 @@ l'autre coté du goulot d'étranglement.
 
 
 ```
-  $ sudo python3 gbeffasarl.py <delai> <bw> <loss_rate> <jitter>
+  $ sudo python3 gbeffasarl.py <delay> <bw> <loss_rate> <jitter>
 ```
 
 Il est possible d'avoir une erreur du controlleur.
@@ -146,4 +146,5 @@ Pour lancer plusieurs clients à la fois vous pouvez utiliser le script test.sh
 ```
 
 # Bugs
-Pour les éventuels problèmes veuillez contacter assogba.emery@gmail.com
+Pour les éventuels problèmes veuillez contacter assogba.emery@gmail.com ou faire
+un pull request.
