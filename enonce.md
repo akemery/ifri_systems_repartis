@@ -3,7 +3,7 @@
 ### Prise en main du serveur et du client
 Exécuter la version rapide et la version lente du client et du serveur. 
 Tracer dans chaque cas les graphes des  fichiers de log de réception et des 
-fichier de log d’envois. Interprèter et commenter les différence de performance.
+fichiers de log d’envoi. Interprèter et commenter les différences de performance.
 Prendre les valeurs `delay=10`, `bw=100`, `loss_rate=0%` et `jitter=0%`
 
 Maintenant nous allons nous concentrer sur la version rapide du serveur et du client.

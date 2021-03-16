@@ -55,6 +55,8 @@ mances du serveur et celles du client.
 `src_file` est le fichier source à déplacer et `dst_file` est sa nouvelle desti-
 nation.
 
+`-f` pour lancer la version rapide du client.
+
 ```
   $ ./client -s server_addr -p server_port -P server_port2 -S send_log_file_path -R recv_log_file_path -i src_file -o dst_file [-f]
 ```
